@@ -75,18 +75,18 @@ public class HashingTest {
 		Map<String, Integer> concurrentHashMapV8 = new ConcurrentHashMapV8<>(capacity, loadFactor);
 		Map<String, Integer> concurrentHashMap = new ConcurrentHashMap<>(capacity, loadFactor);
 		Map<String, Integer> hashtable = new Hashtable<>(capacity, loadFactor);
-		Map<String, Integer> synchronizedMap = Collections
+		Map<String, Integer> synchronizedHashMap = Collections
 				.synchronizedMap(new HashMap<String, Integer>(capacity, loadFactor));
-		Map<String, Integer> hashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
+		Map<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
 		Map<String, Integer> concurrentSkipListMap = new ConcurrentSkipListMap<String, Integer>();
 
 		List<Hash> maps = new ArrayList<>();
 		
-		maps.add(new Hash("LinkedHashMap", hashMap));
+		maps.add(new Hash("linkedHashMap", linkedHashMap));
 		maps.add(new Hash("concurrentHashMapV8", concurrentHashMapV8));
 		maps.add(new Hash("concurrentHashMap", concurrentHashMap));
 		maps.add(new Hash("hashtable", hashtable));
-		maps.add(new Hash("synchronizedMap", synchronizedMap));
+		maps.add(new Hash("synchronizedHashMap", synchronizedHashMap));
 		maps.add(new Hash("concurrentSkipListMap", concurrentSkipListMap));
 		
 		for (final Hash map : maps) {

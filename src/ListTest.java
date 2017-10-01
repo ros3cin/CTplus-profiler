@@ -65,15 +65,15 @@ public class ListTest {
 		System.out.format("Conf: Iterations=%s, threads=%s, N=%s, capacity=%s\n", ITERATIONS, THREADS, N, capacity);
 
 		List<Integer> vector = new Vector<>(capacity);
-		List<Integer> syncList = Collections.synchronizedList(new ArrayList<Integer>(capacity));
-		List<Integer> arrayList = new LinkedList<Integer>();
-		List<Integer> copyOnWrite = new CopyOnWriteArrayList<>();
+		List<Integer> synchronizedArrayList = Collections.synchronizedList(new ArrayList<Integer>(capacity));
+		List<Integer> linkedList = new LinkedList<Integer>();
+		List<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
 
 		List<Lists> lists = new ArrayList<>();
-		lists.add(new Lists("arrayList", arrayList));
+		lists.add(new Lists("linkedList", linkedList));
 		lists.add(new Lists("vector", vector));
-		lists.add(new Lists("syncList", syncList));
-		lists.add(new Lists("copyOnWrite", copyOnWrite));
+		lists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
+		lists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
 
 		for (final Lists list : lists) {
 		//Kenan: Initializing data printer for write, traversalIterator and Get

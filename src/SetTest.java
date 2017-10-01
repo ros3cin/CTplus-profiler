@@ -67,20 +67,20 @@ public class SetTest {
 
 		System.out.format("Conf: Iterations=%s, threads=%s, N=%s, capacity=%s\n", ITERATIONS, THREADS, N, capacity);
 		
-		Set<String> hashSet = new LinkedHashSet<>();
-		Set<String> syncSet = Collections.synchronizedSet(new HashSet<String>());
-		Set<String> copyOnWrite = new CopyOnWriteArraySet<>();
-		Set<String> skipListSet = new ConcurrentSkipListSet<>();
-		Set<String> concurrentHashSet = Collections.newSetFromMap((new ConcurrentHashMap<String, Boolean>()));
-		Set<String> concurrentHashSetV8 = Collections.newSetFromMap((new ConcurrentHashMapV8<String, Boolean>()));
+		Set<String> linkedHashSet = new LinkedHashSet<>();
+		Set<String> synchronizedHashSet = Collections.synchronizedSet(new HashSet<String>());
+		Set<String> copyOnWriteArraySet = new CopyOnWriteArraySet<>();
+		Set<String> concurrentSkipListSet = new ConcurrentSkipListSet<>();
+		Set<String> setFromConcurrentHashMap = Collections.newSetFromMap((new ConcurrentHashMap<String, Boolean>()));
+		Set<String> setFromConcurrentHashMapV8 = Collections.newSetFromMap((new ConcurrentHashMapV8<String, Boolean>()));
 
 		List<Lists> lists = new ArrayList<>();
-		lists.add(new Lists("hashSet", hashSet));
-		lists.add(new Lists("syncSet", syncSet));
-		lists.add(new Lists("skipListSet", skipListSet));
-		lists.add(new Lists("concurrentHashSet", concurrentHashSet));
-		lists.add(new Lists("concurrentHashSetV8", concurrentHashSetV8));
-		lists.add(new Lists("copyOnWrite", copyOnWrite));
+		lists.add(new Lists("linkedHashSet", linkedHashSet));
+		lists.add(new Lists("synchronizedHashSet", synchronizedHashSet));
+		lists.add(new Lists("concurrentSkipListSet", concurrentSkipListSet));
+		lists.add(new Lists("setFromConcurrentHashMap", setFromConcurrentHashMap));
+		lists.add(new Lists("setFromConcurrentHashMapV8", setFromConcurrentHashMapV8));
+		lists.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
 
 		for (final Lists list : lists) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get
@@ -139,6 +139,7 @@ public class SetTest {
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
 		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(value)");
+
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan
@@ -166,9 +167,9 @@ public class SetTest {
 			 * @editEnd: kenan
 			 */
 			
-			if (list.getSet() instanceof CopyOnWriteArraySet) {
+			/*if (list.getSet() instanceof CopyOnWriteArraySet) {
 				break;
-			}
+			}*/
 		}
 
 	}
