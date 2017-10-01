@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
@@ -79,6 +81,8 @@ public class HashingTest {
 				.synchronizedMap(new HashMap<String, Integer>(capacity, loadFactor));
 		Map<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
 		Map<String, Integer> concurrentSkipListMap = new ConcurrentSkipListMap<String, Integer>();
+		Map<String, Integer> synchronizedTreeMap = Collections.synchronizedSortedMap(new TreeMap<String, Integer>());
+		Map<String, Integer> synchronizedWeakHashMap = Collections.synchronizedMap(new WeakHashMap<String, Integer>());
 
 		List<Hash> maps = new ArrayList<>();
 		
@@ -88,6 +92,8 @@ public class HashingTest {
 		maps.add(new Hash("hashtable", hashtable));
 		maps.add(new Hash("synchronizedHashMap", synchronizedHashMap));
 		maps.add(new Hash("concurrentSkipListMap", concurrentSkipListMap));
+		maps.add(new Hash("synchronizedTreeMap", synchronizedTreeMap));
+		maps.add(new Hash("synchronizedWeakHashMap", synchronizedWeakHashMap));
 		
 		for (final Hash map : maps) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get

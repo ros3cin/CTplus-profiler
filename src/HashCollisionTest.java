@@ -7,6 +7,8 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
@@ -74,6 +76,8 @@ public class HashCollisionTest {
 				.synchronizedMap(new HashMap<String, Integer>(capacity, loadFactor));
 		Map<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
 		Map<String, Integer> concurrentSkipListMap = new ConcurrentSkipListMap<String, Integer>();
+		Map<String, Integer> synchronizedTreeMap = Collections.synchronizedSortedMap(new TreeMap<String, Integer>());
+		Map<String, Integer> synchronizedWeakHashMap = Collections.synchronizedMap(new WeakHashMap<String, Integer>());
 
 		List<Hash> maps = new ArrayList<>();
 		
@@ -83,6 +87,8 @@ public class HashCollisionTest {
 		maps.add(new Hash("hashtable", hashtable));
 		maps.add(new Hash("synchronizedMap", synchronizedHashMap));
 		maps.add(new Hash("concurrentSkipListMap", concurrentSkipListMap));
+		maps.add(new Hash("synchronizedTreeMap", synchronizedTreeMap));
+		maps.add(new Hash("synchronizedWeakHashMap", synchronizedWeakHashMap));
 		
 		for (final Hash map : maps) {
 			
