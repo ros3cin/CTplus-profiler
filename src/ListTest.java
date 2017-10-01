@@ -64,30 +64,58 @@ public class ListTest {
 
 		System.out.format("Conf: Iterations=%s, threads=%s, N=%s, capacity=%s\n", ITERATIONS, THREADS, N, capacity);
 
+		//synchronized lists
 		List<Integer> vector = new Vector<>(capacity);
 		List<Integer> synchronizedArrayList = Collections.synchronizedList(new ArrayList<Integer>(capacity));
-		List<Integer> linkedList = new LinkedList<Integer>();
+		List<Integer> synchronizedLinkedList = Collections.synchronizedList(new LinkedList<Integer>());
 		List<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+		
+		//non synchronized lists
+		List<Integer> arrayList = new ArrayList<Integer>(capacity);
+		List<Integer> linkedList = new LinkedList<Integer>();
 
-		List<Lists> lists = new ArrayList<>();
-		lists.add(new Lists("linkedList", linkedList));
-		lists.add(new Lists("vector", vector));
-		lists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
-		lists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
+		List<Lists> synchronizedLists = new ArrayList<>();
+		synchronizedLists.add(new Lists("synchronizedLinkedList", synchronizedLinkedList));
+		synchronizedLists.add(new Lists("vector", vector));
+		synchronizedLists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
+		synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
+		
+		List<Lists> nonSynchronizedLists = new ArrayList<>();
+		nonSynchronizedLists.add(new Lists("arrayList",arrayList));
+		nonSynchronizedLists.add(new Lists("linkedList",linkedList));
 
-		for (final Lists list : lists) {
-		//Kenan: Initializing data printer for write, traversalIterator and Get
-		EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+		for (final Lists list : synchronizedLists) {
+			//Kenan: Initializing data printer for write, traversalIterator and Get
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			
 			// we should write before read or remove ops
 			write(list, THREADS, N, ITERATIONS);
 			traversalIterator(list, THREADS, N, ITERATIONS);
 			traversalGet(list, THREADS, N, ITERATIONS);
-		//Kenan: Reinitializing data printer for remove. No warmup.
-		EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
+			
+			//Kenan: Reinitializing data printer for remove. No warmup.
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
 			traversalRemove(list, THREADS, N);
 
 			list.getList().clear();
 		}
+		
+		final int ZERO_THREADS=0;
+		for (final Lists list : nonSynchronizedLists) {
+			//Kenan: Initializing data printer for write, traversalIterator and Get
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			// we should write before read or remove ops
+			write(list, ZERO_THREADS, N, ITERATIONS);
+			traversalIterator(list, ZERO_THREADS, N, ITERATIONS);
+			traversalGet(list, ZERO_THREADS, N, ITERATIONS);
+			//Kenan: Reinitializing data printer for remove. No warmup.
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
+			traversalRemove(list, ZERO_THREADS, N);
+
+			list.getList().clear();
+		}
+		
+		
 	}
 
 	private static void write(final Lists list, int threads, final int total,
@@ -104,23 +132,32 @@ public class ListTest {
 			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 			//Kenan
-
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Runnable() {
-					@Override
-					public void run() {
-						try{ //used only in the non-thread-safe case
-						for (int j = 0; j < total; j++) {
-							list.getList().add(j);
-							//System.out.println(list.getList().size());
+			
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							try{ //used only in the non-thread-safe case
+							for (int j = 0; j < total; j++) {
+								list.getList().add(j);
+								//System.out.println(list.getList().size());
+							}
+							}catch (ArrayIndexOutOfBoundsException e){}
 						}
-						}catch (ArrayIndexOutOfBoundsException e){}
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				try{ 
+					for (int j = 0; j < total; j++) {
+						list.getList().add(j);
 					}
-				});
+				}catch (ArrayIndexOutOfBoundsException e){}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
+			
 	  	  /**
 		   * @editStart: kenan
 		   */
@@ -152,31 +189,42 @@ public class ListTest {
 
 
 		for (int i = 0; i < iterations; i++) {
-		//Kenan
-		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
-		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
-		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
-		//Kenan
+			//Kenan
+			ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+			//Kenan
 
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Runnable() {
-					@Override
-					public void run() {
-						int i = 0;
-						try {
-							//System.out.println(list.getList().size());
-						for (Integer key : list.getList()) {
-							Integer e = key;
-							i++;
-							if(i >= total) break;
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							int i = 0;
+							try {
+								//System.out.println(list.getList().size());
+							for (Integer key : list.getList()) {
+								Integer e = key;
+								i++;
+								if(i >= total) break;
+							}
+						} catch (Exception e) {}
 						}
-					} catch (Exception e) {}
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				int z = 0;
+				try {
+					for (Integer key : list.getList()) {
+						Integer e = key;
+						z++;
+						if(z >= total) break;
 					}
-				});
+				} catch (Exception e) {}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
       /**
        * @editStart: kenan
        */
@@ -211,23 +259,31 @@ public class ListTest {
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 			//Kenan
 
-
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Runnable() {
-					@Override
-					public void run() {
-						List<Integer> l = list.getList();
-						for (int j = 0; j < total; j++) {
-							try {
-							Integer e = l.get(j);
-						} catch (Exception e) {}
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							List<Integer> l = list.getList();
+							for (int j = 0; j < total; j++) {
+								try {
+								Integer e = l.get(j);
+							} catch (Exception e) {}
+							}
 						}
-					}
-				});
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				List<Integer> l = list.getList();
+				for (int j = 0; j < total; j++) {
+					try {
+						Integer e = l.get(j);
+					} catch (Exception e) {}
+				}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
       /**
        * @editStart: kenan
        */
@@ -256,25 +312,35 @@ public class ListTest {
 		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 		//Kenan
-
-		ExecutorService executors = Executors.newFixedThreadPool(threads);
-		for (int j = 0; j < threads; j++) {
-			executors.execute(new Runnable() {
-				@Override
-				public void run() {
-					List<Integer> l = list.getList();
-					try {
-						for (int j = 0; j < total; j++) {
-							Integer e = l.remove(j);
+		
+		if(threads>0) {
+			ExecutorService executors = Executors.newFixedThreadPool(threads);
+			for (int j = 0; j < threads; j++) {
+				executors.execute(new Runnable() {
+					@Override
+					public void run() {
+						List<Integer> l = list.getList();
+						try {
+							for (int j = 0; j < total; j++) {
+								Integer e = l.remove(j);
+							}
+						} catch (Exception e) {
 						}
-					} catch (Exception e) {
 					}
+				});
+			}
+	
+			executors.shutdown();
+			executors.awaitTermination(1, TimeUnit.DAYS);
+		} else {
+			List<Integer> l = list.getList();
+			try {
+				for (int j = 0; j < total; j++) {
+					Integer e = l.remove(j);
 				}
-			});
+			} catch (Exception e) {
+			}
 		}
-
-		executors.shutdown();
-		executors.awaitTermination(1, TimeUnit.DAYS);
 
    /**
        * @editStart: kenan
