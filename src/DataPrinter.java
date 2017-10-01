@@ -1,6 +1,8 @@
 
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 
 public class DataPrinter extends EnergyCalc{
 	
@@ -9,11 +11,13 @@ public class DataPrinter extends EnergyCalc{
 	String methodName = null;
 	public boolean hasTimeCalc = false;
 	int threadsNeedCalcInTime = 0;
+	private String operationName;
 	
-	public DataPrinter(String methodName, int threadsNeedCalcInTime) {
+	public DataPrinter(String methodName, int threadsNeedCalcInTime, String operationName) {
 		super();
 		this.threadsNeedCalcInTime = threadsNeedCalcInTime;
     	this.methodName = methodName;
+    	this.operationName=operationName;
 	}
 	
     public DataPrinter(String methodName, String preEnergy, double wallClockTimeStart, String timePreamble, 
@@ -25,37 +29,34 @@ public class DataPrinter extends EnergyCalc{
     	this.methodName = methodName;
     }
     
-	public void printResult(String signal, int loopNum) {
+	public void printResult(String signal, int loopNum) throws ParseException {
 
 		DecimalFormat df = new DecimalFormat("#.##");
 		DecimalFormat frq = new DecimalFormat("#.#");
 		
 		for (int k = 0; k < sockNum; k++) {
-			gpuEnerPowerSum[k] = Double.valueOf(df.format(gpuEnerPowerSum[k]
-					/ loopNum));
-			cpuEnerPowerSum[k] = Double.valueOf(df.format(cpuEnerPowerSum[k]
-					/ loopNum));
-			pkgEnerPowerSum[k] = Double.valueOf(df.format(pkgEnerPowerSum[k]
-					/ loopNum));
+			gpuEnerPowerSum[k] = NumberFormat.getInstance().parse(df.format(gpuEnerPowerSum[k]/ loopNum)).doubleValue();
+			cpuEnerPowerSum[k] = NumberFormat.getInstance().parse(df.format(cpuEnerPowerSum[k]/ loopNum)).doubleValue();
+			pkgEnerPowerSum[k] = NumberFormat.getInstance().parse(df.format(pkgEnerPowerSum[k]/ loopNum)).doubleValue();
 			
-			gpuEnergySum[k] = Double.valueOf(df.format(gpuEnergySum[k] / loopNum));
-			cpuEnergySum[k] = Double.valueOf(df.format(cpuEnergySum[k] / loopNum));
-			pkgEnergySum[k] = Double.valueOf(df.format(pkgEnergySum[k] / loopNum));
+			gpuEnergySum[k] = NumberFormat.getInstance().parse(df.format(gpuEnergySum[k] / loopNum)).doubleValue();
+			cpuEnergySum[k] = NumberFormat.getInstance().parse(df.format(cpuEnergySum[k] / loopNum)).doubleValue();
+			pkgEnergySum[k] = NumberFormat.getInstance().parse(df.format(pkgEnergySum[k] / loopNum)).doubleValue();
 		}
 //		System.out.println("====================================================");
 		/**** Time and Energy information ****/
 		if(NumThread != 0)
-			System.out.print(NumThread + "," + Double.valueOf(frq.format(frequency/1000000.0)) + ",");
+			System.out.print(NumThread + "," + NumberFormat.getInstance().parse(frq.format(frequency/1000000.0)).doubleValue() + ",");
 		if(powerOption == 0 || powerOption == 1 || (powerOption == 2 && pkgPower != 0))
 			System.out.print(pkgPower + "-" + dramPower + "," + pkgTime + "-" + dramTime + ",");
 		else 
 			System.out.print("power_limit_disable,power_limit_disable,");
 		
-		System.out.print(signal + ","
-				+ Double.valueOf(df.format(wallClockTime / loopNum)) + ","
-				+ Double.valueOf(df.format(cpuTime / loopNum)) + ","
-				+ Double.valueOf(df.format(userModeTime / loopNum)) + ","
-				+ Double.valueOf(df.format(kernelModeTime / loopNum)));
+		System.out.print(signal + "," + operationName + ","
+				+ NumberFormat.getInstance().parse(df.format(wallClockTime / loopNum)).doubleValue() + ","
+				+ NumberFormat.getInstance().parse(df.format(cpuTime / loopNum)).doubleValue() + ","
+				+ NumberFormat.getInstance().parse(df.format(userModeTime / loopNum)).doubleValue() + ","
+				+ NumberFormat.getInstance().parse(df.format(kernelModeTime / loopNum)).doubleValue());
 
 		for (int i = 0; i < sockNum; i++) {
 			System.out.print(","
@@ -142,7 +143,7 @@ public class DataPrinter extends EnergyCalc{
 		
 	}
 
-	public void dataReport() {
+	public void dataReport() throws ParseException {
 		this.count++;
 		//warmup iterations
 		if(count <= warmup) {
@@ -165,6 +166,14 @@ public class DataPrinter extends EnergyCalc{
 
 		}
 	
+	}
+
+	public String getOperationName() {
+		return operationName;
+	}
+
+	public void setOperationName(String operationName) {
+		this.operationName = operationName;
 	}
 
 }

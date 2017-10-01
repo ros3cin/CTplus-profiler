@@ -1,4 +1,5 @@
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -112,11 +113,11 @@ public class HashCollisionTest {
 	}
 
 	private static void write(final Hash map, int threads, final int total,
-			int iterations) throws InterruptedException {
+			int iterations) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD);
+		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(constant-key,value)");
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan

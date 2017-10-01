@@ -1,5 +1,5 @@
-
-
+import java.text.NumberFormat;
+import java.text.ParseException;
 
 public class EnergyCalc extends TimeCalc implements StandDevCal{
 
@@ -159,7 +159,7 @@ public class EnergyCalc extends TimeCalc implements StandDevCal{
 		
 	}
     
-	public void energyCalc(int loopCount) {
+	public void energyCalc(int loopCount) throws ParseException {
 		this.loopCount = loopCount;
 		double delta = 0.0;
 		
@@ -191,7 +191,8 @@ public class EnergyCalc extends TimeCalc implements StandDevCal{
 		}
 
 		for(int i = 0; i < sockNum; i++) {
-			delta = calculateEnergy(Double.parseDouble(loopEnergyStop[i][0]), Double.parseDouble(loopEnergyStart[i][0]));
+			;
+			delta = calculateEnergy(NumberFormat.getInstance().parse(loopEnergyStop[i][0]).doubleValue(), NumberFormat.getInstance().parse(loopEnergyStart[i][0]).doubleValue());
 			//record for standard deviation
 			gpuEnerPerLoop[i][loopCount] = delta;
 			//record for average energy/power consumption
@@ -199,14 +200,14 @@ public class EnergyCalc extends TimeCalc implements StandDevCal{
 			
 			delta = getPower(delta, curWallClockTime);
 			gpuEnerPowerSum[i] += delta;//Restore energy information for each loop
-			delta = calculateEnergy(Double.parseDouble(loopEnergyStop[i][1]), Double.parseDouble(loopEnergyStart[i][1]));
+			delta = calculateEnergy(NumberFormat.getInstance().parse(loopEnergyStop[i][1]).doubleValue(), NumberFormat.getInstance().parse(loopEnergyStart[i][1]).doubleValue());
 			//record for standard deviation
 			cpuEnerPerLoop[i][loopCount] = delta;
 			//record for average energy/power consumption
 			cpuEnergySum[i] += delta;
 			delta = getPower(delta, curWallClockTime);
 			cpuEnerPowerSum[i] += delta;
-			delta = calculateEnergy(Double.parseDouble(loopEnergyStop[i][2]), Double.parseDouble(loopEnergyStart[i][2]));
+			delta = calculateEnergy(NumberFormat.getInstance().parse(loopEnergyStop[i][2]).doubleValue(), NumberFormat.getInstance().parse(loopEnergyStart[i][2]).doubleValue());
 			//record for standard deviation
 			pkgEnerPerLoop[i][loopCount] = delta;
 			//record for average energy/power consumption

@@ -1,4 +1,5 @@
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -133,11 +134,11 @@ public class SetTest {
 	}
 
 	private static void write(final Lists list, int threads, final int total,
-			int iterations) throws InterruptedException {
+			int iterations) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(value)");
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan
@@ -173,11 +174,11 @@ public class SetTest {
 	}
 
 	static void traversalIterator(final Lists list, final int threads, final int total,
-			int iterations) throws InterruptedException {
+			int iterations) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"iterator");
 		//Kenan
 		
 		for (int i = 0; i < iterations; i++) {
@@ -216,13 +217,13 @@ public class SetTest {
 
 	}
 	
-	static void traversalRemove(final Lists list, final int threads, final int total) throws InterruptedException {
+	static void traversalRemove(final Lists list, final int threads, final int total) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 
 		//Kenan
 
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(key)");
 		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
 		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
