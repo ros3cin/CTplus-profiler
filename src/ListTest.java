@@ -98,6 +98,14 @@ public class ListTest {
 			traversalRemove(list, THREADS, N);
 
 			list.getList().clear();
+			
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			writeAtBeginning(list, THREADS, N, ITERATIONS);
+			list.getList().clear();
+			
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			writeAtEnding(list, THREADS, N, ITERATIONS);
+			list.getList().clear();
 		}
 		
 		final int ZERO_THREADS=0;
@@ -112,6 +120,14 @@ public class ListTest {
 			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
 			traversalRemove(list, ZERO_THREADS, N);
 
+			list.getList().clear();
+			
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			writeAtBeginning(list, ZERO_THREADS, N, ITERATIONS);
+			list.getList().clear();
+			
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			writeAtEnding(list, ZERO_THREADS, N, ITERATIONS);
 			list.getList().clear();
 		}
 		
@@ -142,6 +158,126 @@ public class ListTest {
 							try{ //used only in the non-thread-safe case
 							for (int j = 0; j < total; j++) {
 								list.getList().add(j);
+								//System.out.println(list.getList().size());
+							}
+							}catch (ArrayIndexOutOfBoundsException e){}
+						}
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				try{ 
+					for (int j = 0; j < total; j++) {
+						list.getList().add(j);
+					}
+				}catch (ArrayIndexOutOfBoundsException e){}
+			}
+			
+	  	  /**
+		   * @editStart: kenan
+		   */
+			ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+			ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+			ener.dataReport();
+			if(/*list.getList() instanceof CopyOnWriteArrayList && */i+1!=iterations){
+				list.getList().clear();
+			}
+
+		  /**
+		   * @editEnd: kenan
+		   */
+
+		}
+
+    
+	}
+	
+	private static void writeAtBeginning(final Lists list, int threads, final int total,
+			int iterations) throws InterruptedException, ParseException {
+		List<String> lastThree = new ArrayList<>();
+		//Kenan
+		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(starting-index,value)");
+		//Kenan
+
+		for (int i = 0; i < iterations; i++) {
+			//Kenan
+			ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+			//Kenan
+			
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							try{ //used only in the non-thread-safe case
+							for (int j = 0; j < total; j++) {
+								list.getList().add(0,j);
+								//System.out.println(list.getList().size());
+							}
+							}catch (ArrayIndexOutOfBoundsException e){}
+						}
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				try{ 
+					for (int j = 0; j < total; j++) {
+						list.getList().add(j);
+					}
+				}catch (ArrayIndexOutOfBoundsException e){}
+			}
+			
+	  	  /**
+		   * @editStart: kenan
+		   */
+			ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+			ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+			ener.dataReport();
+			if(/*list.getList() instanceof CopyOnWriteArrayList && */i+1!=iterations){
+				list.getList().clear();
+			}
+
+		  /**
+		   * @editEnd: kenan
+		   */
+
+		}
+
+    
+	}
+	
+	private static void writeAtEnding(final Lists list, int threads, final int total,
+			int iterations) throws InterruptedException, ParseException {
+		List<String> lastThree = new ArrayList<>();
+		//Kenan
+		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(ending-index,value)");
+		//Kenan
+
+		for (int i = 0; i < iterations; i++) {
+			//Kenan
+			ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+			//Kenan
+			
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							try{ //used only in the non-thread-safe case
+							for (int j = 0; j < total; j++) {
+								list.getList().add(list.getList().size(),j);
 								//System.out.println(list.getList().size());
 							}
 							}catch (ArrayIndexOutOfBoundsException e){}
