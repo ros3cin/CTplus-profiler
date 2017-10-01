@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -67,22 +68,33 @@ public class SetTest {
 
 		System.out.format("Conf: Iterations=%s, threads=%s, N=%s, capacity=%s\n", ITERATIONS, THREADS, N, capacity);
 		
-		Set<String> linkedHashSet = new LinkedHashSet<>();
+		Set<String> synchronizedLinkedHashSet = Collections.synchronizedSet(new LinkedHashSet<>());
 		Set<String> synchronizedHashSet = Collections.synchronizedSet(new HashSet<String>());
 		Set<String> copyOnWriteArraySet = new CopyOnWriteArraySet<>();
 		Set<String> concurrentSkipListSet = new ConcurrentSkipListSet<>();
 		Set<String> setFromConcurrentHashMap = Collections.newSetFromMap((new ConcurrentHashMap<String, Boolean>()));
 		Set<String> setFromConcurrentHashMapV8 = Collections.newSetFromMap((new ConcurrentHashMapV8<String, Boolean>()));
+		Set<String> synchronizedTreeSet = Collections.synchronizedSortedSet(new TreeSet<String>());
+		
+		Set<String> hashSet = new HashSet<String>();
+		Set<String> linkedHashSet = new LinkedHashSet<String>();
+		Set<String> treeSet = new TreeSet<String>();
 
-		List<Lists> lists = new ArrayList<>();
-		lists.add(new Lists("linkedHashSet", linkedHashSet));
-		lists.add(new Lists("synchronizedHashSet", synchronizedHashSet));
-		lists.add(new Lists("concurrentSkipListSet", concurrentSkipListSet));
-		lists.add(new Lists("setFromConcurrentHashMap", setFromConcurrentHashMap));
-		lists.add(new Lists("setFromConcurrentHashMapV8", setFromConcurrentHashMapV8));
-		lists.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
+		List<Lists> synchronizedSets = new ArrayList<>();
+		synchronizedSets.add(new Lists("synchronizedLinkedHashSet", synchronizedLinkedHashSet));
+		synchronizedSets.add(new Lists("synchronizedHashSet", synchronizedHashSet));
+		synchronizedSets.add(new Lists("concurrentSkipListSet", concurrentSkipListSet));
+		synchronizedSets.add(new Lists("setFromConcurrentHashMap", setFromConcurrentHashMap));
+		synchronizedSets.add(new Lists("setFromConcurrentHashMapV8", setFromConcurrentHashMapV8));
+		synchronizedSets.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
+		synchronizedSets.add(new Lists("synchronizedTreeSet", synchronizedTreeSet));
+		
+		List<Lists> nonSynchronizedSets = new ArrayList<>();
+		nonSynchronizedSets.add(new Lists("hashSet",hashSet));
+		nonSynchronizedSets.add(new Lists("linkedHashSet",linkedHashSet));
+		nonSynchronizedSets.add(new Lists("treeSet",treeSet));
 
-		for (final Lists list : lists) {
+		for (final Lists list : synchronizedSets) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			write(list, THREADS, N, ITERATIONS);
@@ -90,6 +102,20 @@ public class SetTest {
 			//Kenan: Reinitializing data printer for remove. No warmup.
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
 			traversalRemove(list, THREADS, N);
+			
+
+			list.getSet().clear();
+		}
+		
+		final int ZERO_THREADS=0;
+		for (final Lists list : nonSynchronizedSets) {
+			//Kenan: Initializing data printer for write, traversalIterator and Get
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			write(list, ZERO_THREADS, N, ITERATIONS);
+			traversalIterator(list, ZERO_THREADS, N, ITERATIONS);
+			//Kenan: Reinitializing data printer for remove. No warmup.
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
+			traversalRemove(list, ZERO_THREADS, N);
 			
 
 			list.getSet().clear();
@@ -148,12 +174,18 @@ public class SetTest {
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 			//Kenan
 			
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Run(list, j, total));
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Run(list, j, total));
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				for (int k = 0; k < total; k++) {
+					list.getSet().add(k + "-" + "1");
+				}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
 
 			/**
 			 * @editStart: kenan
@@ -189,19 +221,25 @@ public class SetTest {
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 			//Kenan
 			
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Runnable() {
-					@Override
-					public void run() {
-						for (String key : list.getSet()) {
-							String e = key;
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							for (String key : list.getSet()) {
+								String e = key;
+							}
 						}
-					}
-				});
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				for (String key : list.getSet()) {
+					String e = key;
+				}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
 
 			/**
 			 * @editStart: kenan
@@ -230,23 +268,30 @@ public class SetTest {
 		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 		//Kenan
 		
-		ExecutorService executors = Executors.newFixedThreadPool(threads);
-		for (int j = 0; j < threads; j++) {
-			executors.execute(new Remover(list, j, total));
+		if(threads>0) {
+			ExecutorService executors = Executors.newFixedThreadPool(threads);
+			for (int j = 0; j < threads; j++) {
+				executors.execute(new Remover(list, j, total));
+			}
+			executors.shutdown();
+			executors.awaitTermination(1, TimeUnit.DAYS);
+		} else {
+			for (int k = 0; k < total; k++) {
+				String key = String.valueOf(k) + "-"+ "1";
+				list.getSet().remove(key);
+			}
 		}
-		executors.shutdown();
-		executors.awaitTermination(1, TimeUnit.DAYS);
 
-		   /**
-	       * @editStart: kenan
-	       */
-	      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
-			ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
-			ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
-			ener.dataReport();
+	   /**
+       * @editStart: kenan
+       */
+      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+		ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+		ener.dataReport();
 
-	      /**
-	       * @editEnd: kenan
-	       */
+      /**
+       * @editEnd: kenan
+       */
 	}
 }
