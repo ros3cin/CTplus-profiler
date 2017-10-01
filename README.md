@@ -11,4 +11,10 @@ Don't forget to initialize the msr module with:
 ```
 sudo modprobe msr
 ```
-
+Instructions
+--------------------------------------------------------------
+To run the profiler:
+1. Go to the MainTest class
+2. Right click and go to 'Run As' - 'Run Configurations'
+3. At the 'Arguments' tab type: [hash|list|set|collision] number_of_threads amount_of_operations capacity loadfactor
+4. Parameters up to capacity are used by lists and sets, maps also use the fourth parameter, which is a float between 0 and 1
