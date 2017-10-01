@@ -77,25 +77,35 @@ public class HashingTest {
 		Map<String, Integer> concurrentHashMapV8 = new ConcurrentHashMapV8<>(capacity, loadFactor);
 		Map<String, Integer> concurrentHashMap = new ConcurrentHashMap<>(capacity, loadFactor);
 		Map<String, Integer> hashtable = new Hashtable<>(capacity, loadFactor);
-		Map<String, Integer> synchronizedHashMap = Collections
-				.synchronizedMap(new HashMap<String, Integer>(capacity, loadFactor));
-		Map<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
+		Map<String, Integer> synchronizedHashMap = Collections.synchronizedMap(new HashMap<String, Integer>(capacity, loadFactor));
+		Map<String, Integer> synchronizedLinkedHashMap = Collections.synchronizedMap(new LinkedHashMap<String, Integer>(capacity, loadFactor));
 		Map<String, Integer> concurrentSkipListMap = new ConcurrentSkipListMap<String, Integer>();
 		Map<String, Integer> synchronizedTreeMap = Collections.synchronizedSortedMap(new TreeMap<String, Integer>());
 		Map<String, Integer> synchronizedWeakHashMap = Collections.synchronizedMap(new WeakHashMap<String, Integer>());
+		
+		Map<String, Integer> hashMap = new HashMap<String, Integer>(capacity,loadFactor);
+		Map<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
+		Map<String, Integer> treeMap = new TreeMap<String, Integer>();
+		Map<String, Integer> weakHashMap = new WeakHashMap<String, Integer>(capacity,loadFactor);
+		
 
-		List<Hash> maps = new ArrayList<>();
+		List<Hash> synchronizedMaps = new ArrayList<>();
+		synchronizedMaps.add(new Hash("linkedHashMap", synchronizedLinkedHashMap));
+		synchronizedMaps.add(new Hash("concurrentHashMapV8", concurrentHashMapV8));
+		synchronizedMaps.add(new Hash("concurrentHashMap", concurrentHashMap));
+		synchronizedMaps.add(new Hash("hashtable", hashtable));
+		synchronizedMaps.add(new Hash("synchronizedHashMap", synchronizedHashMap));
+		synchronizedMaps.add(new Hash("concurrentSkipListMap", concurrentSkipListMap));
+		synchronizedMaps.add(new Hash("synchronizedTreeMap", synchronizedTreeMap));
+		synchronizedMaps.add(new Hash("synchronizedWeakHashMap", synchronizedWeakHashMap));
 		
-		maps.add(new Hash("linkedHashMap", linkedHashMap));
-		maps.add(new Hash("concurrentHashMapV8", concurrentHashMapV8));
-		maps.add(new Hash("concurrentHashMap", concurrentHashMap));
-		maps.add(new Hash("hashtable", hashtable));
-		maps.add(new Hash("synchronizedHashMap", synchronizedHashMap));
-		maps.add(new Hash("concurrentSkipListMap", concurrentSkipListMap));
-		maps.add(new Hash("synchronizedTreeMap", synchronizedTreeMap));
-		maps.add(new Hash("synchronizedWeakHashMap", synchronizedWeakHashMap));
+		List<Hash> nonSynchronizedMaps = new ArrayList<>();
+		nonSynchronizedMaps.add(new Hash("hashMap", hashMap));
+		nonSynchronizedMaps.add(new Hash("linkedHashMap", linkedHashMap));
+		nonSynchronizedMaps.add(new Hash("treeMap", treeMap));
+		nonSynchronizedMaps.add(new Hash("weakHashMap", weakHashMap));
 		
-		for (final Hash map : maps) {
+		for (final Hash map : synchronizedMaps) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			write(map, THREADS, N, ITERATIONS);
@@ -103,6 +113,19 @@ public class HashingTest {
 			//Kenan: Reinitializing data printer for remove. No warmup.
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
 			remove(map, THREADS, N);
+			
+			map.getMap().clear();
+		}
+		
+		final int ZERO_THREADS=0;
+		for (final Hash map : nonSynchronizedMaps) {
+			//Kenan: Initializing data printer for write, traversalIterator and Get
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			write(map, ZERO_THREADS, N, ITERATIONS);
+			traversal(map, ZERO_THREADS, N, ITERATIONS);
+			//Kenan: Reinitializing data printer for remove. No warmup.
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
+			remove(map, ZERO_THREADS, N);
 			
 			map.getMap().clear();
 		}
@@ -121,13 +144,20 @@ public class HashingTest {
 			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 			//Kenan
-
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Writer(map, j, total));
+			
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Writer(map, j, total));
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				for (int k = 0; k < total; k++) {
+					String key = String.valueOf(k) + "-"+ "1";
+					map.getMap().put(key, k);
+				}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
 
 		  	  /**
 			   * @editStart: kenan
@@ -196,24 +226,33 @@ public class HashingTest {
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
 			//Kenan
 			
-
-			ExecutorService executors = Executors.newFixedThreadPool(threads);
-			for (int j = 0; j < threads; j++) {
-				executors.execute(new Runnable() {
-					@Override
-					public void run() {
-						Set<String> keys = map.getMap().keySet();
-						int i=0;
-						for (String key : keys) {
-							Integer e = map.getMap().get(key);
-							i++;
-							if(i>= total) break;
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							Set<String> keys = map.getMap().keySet();
+							int i=0;
+							for (String key : keys) {
+								Integer e = map.getMap().get(key);
+								i++;
+								if(i>= total) break;
+							}
 						}
-					}
-				});
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				Set<String> keys = map.getMap().keySet();
+				int z=0;
+				for (String key : keys) {
+					Integer e = map.getMap().get(key);
+					z++;
+					if(z>= total) break;
+				}
 			}
-			executors.shutdown();
-			executors.awaitTermination(1, TimeUnit.DAYS);
 
 		     /**
 		       * @editStart: kenan
@@ -241,24 +280,31 @@ public class HashingTest {
 		ener.preEnergy = EnergyCheckUtils.EnergyStatCheck();
 		// Kenan
 
-		ExecutorService executors = Executors.newFixedThreadPool(threads);
-		for (int j = 0; j < threads; j++) {
-			executors.execute(new Remover(map, j, total));
+		if(threads>0) {
+			ExecutorService executors = Executors.newFixedThreadPool(threads);
+			for (int j = 0; j < threads; j++) {
+				executors.execute(new Remover(map, j, total));
+			}
+			executors.shutdown();
+			executors.awaitTermination(1, TimeUnit.DAYS);
+		} else {
+			for (int k = 0; k < total; k++) {
+				String key = String.valueOf(k) + "-"+ "1";
+				map.getMap().remove(key);
+			}
 		}
-		executors.shutdown();
-		executors.awaitTermination(1, TimeUnit.DAYS);
 
-		   /**
-	       * @editStart: kenan
-	       */
-	      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
-			ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
-			ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
-			ener.dataReport();
+	   /**
+       * @editStart: kenan
+       */
+      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+		ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+		ener.dataReport();
 
-	      /**
-	       * @editEnd: kenan
-	       */
+      /**
+       * @editEnd: kenan
+       */
 
 	}
 	
