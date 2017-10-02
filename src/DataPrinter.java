@@ -12,12 +12,14 @@ public class DataPrinter extends EnergyCalc{
 	public boolean hasTimeCalc = false;
 	int threadsNeedCalcInTime = 0;
 	private String operationName;
+	private boolean printForAnalyzer;
 	
-	public DataPrinter(String methodName, int threadsNeedCalcInTime, String operationName) {
+	public DataPrinter(String methodName, int threadsNeedCalcInTime, String operationName, boolean printForAnalyzer) {
 		super();
 		this.threadsNeedCalcInTime = threadsNeedCalcInTime;
     	this.methodName = methodName;
     	this.operationName=operationName;
+    	this.printForAnalyzer=printForAnalyzer;
 	}
 	
     public DataPrinter(String methodName, String preEnergy, double wallClockTimeStart, String timePreamble, 
@@ -45,38 +47,48 @@ public class DataPrinter extends EnergyCalc{
 		}
 //		System.out.println("====================================================");
 		/**** Time and Energy information ****/
-		if(NumThread != 0)
-			System.out.print(NumThread + "," + NumberFormat.getInstance().parse(frq.format(frequency/1000000.0)).doubleValue() + ",");
-		if(powerOption == 0 || powerOption == 1 || (powerOption == 2 && pkgPower != 0))
-			System.out.print(pkgPower + "-" + dramPower + "," + pkgTime + "-" + dramTime + ",");
-		else 
-			System.out.print("power_limit_disable,power_limit_disable,");
-		
-		System.out.print(signal + "," + operationName + ","
-				+ NumberFormat.getInstance().parse(df.format(wallClockTime / loopNum)).doubleValue() + ","
-				+ NumberFormat.getInstance().parse(df.format(cpuTime / loopNum)).doubleValue() + ","
-				+ NumberFormat.getInstance().parse(df.format(userModeTime / loopNum)).doubleValue() + ","
-				+ NumberFormat.getInstance().parse(df.format(kernelModeTime / loopNum)).doubleValue());
-
-		for (int i = 0; i < sockNum; i++) {
-			System.out.print(","
-					+ gpuEnergySum[i] 
-					+ ","
-					+ cpuEnergySum[i] 
-					+ ","
-					+ pkgEnergySum[i] 
-					+ ","); 
-			// Power information
-			if (wallClockTime != 0.0) {
-				System.out.print(gpuEnerPowerSum[i] + "," + cpuEnerPowerSum[i] + ","
-						+ pkgEnerPowerSum[i]);
-			} else
-				System.out.print("0.00," + "0.00," + "0.00");
-			
-			System.out.print("," + gpuEnerSD[i] + "," + cpuEnerSD[i] + "," + pkgEnerSD[i]);
-			
+		if(!printForAnalyzer) {
+			if(NumThread != 0)
+				System.out.print(NumThread + "," + NumberFormat.getInstance().parse(frq.format(frequency/1000000.0)).doubleValue() + ",");
+			if(powerOption == 0 || powerOption == 1 || (powerOption == 2 && pkgPower != 0))
+				System.out.print(pkgPower + "-" + dramPower + "," + pkgTime + "-" + dramTime + ",");
+			else 
+				System.out.print("power_limit_disable,power_limit_disable,");
 		}
-		System.out.print("," + wallClockTimeSD);
+		
+		if(!printForAnalyzer) {
+			System.out.print(signal + "," + operationName + ","
+					+ NumberFormat.getInstance().parse(df.format(wallClockTime / loopNum)).doubleValue() + ","
+					+ NumberFormat.getInstance().parse(df.format(cpuTime / loopNum)).doubleValue() + ","
+					+ NumberFormat.getInstance().parse(df.format(userModeTime / loopNum)).doubleValue() + ","
+					+ NumberFormat.getInstance().parse(df.format(kernelModeTime / loopNum)).doubleValue());
+		}
+
+		if(!printForAnalyzer) {
+			for (int i = 0; i < sockNum; i++) {
+				System.out.print(","
+						+ gpuEnergySum[i] 
+						+ ","
+						+ cpuEnergySum[i] 
+						+ ","
+						+ pkgEnergySum[i] 
+						+ ","); 
+				// Power information
+				if (wallClockTime != 0.0) {
+					System.out.print(gpuEnerPowerSum[i] + "," + cpuEnerPowerSum[i] + ","
+							+ pkgEnerPowerSum[i]);
+				} else
+					System.out.print("0.00," + "0.00," + "0.00");
+				
+				System.out.print("," + gpuEnerSD[i] + "," + cpuEnerSD[i] + "," + pkgEnerSD[i]);
+				
+			}
+			System.out.print("," + wallClockTimeSD);
+		}
+		
+		if(printForAnalyzer) {
+			System.out.print(signal+","+operationName+","+gpuEnergySum[0]+","+cpuEnergySum[0]+","+pkgEnergySum[0]);
+		}
 		System.out.println();
 	}
     
@@ -174,6 +186,14 @@ public class DataPrinter extends EnergyCalc{
 
 	public void setOperationName(String operationName) {
 		this.operationName = operationName;
+	}
+
+	public boolean isPrintForAnalyzer() {
+		return printForAnalyzer;
+	}
+
+	public void setPrintForAnalyzer(boolean printForAnalyzer) {
+		this.printForAnalyzer = printForAnalyzer;
 	}
 
 }

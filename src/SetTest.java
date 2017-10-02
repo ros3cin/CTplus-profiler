@@ -164,7 +164,7 @@ public class SetTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(value)");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(value)",MainTest.printForAnalyzer);
 
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
@@ -211,7 +211,7 @@ public class SetTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"iterator");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"iterator",MainTest.printForAnalyzer);
 		//Kenan
 		
 		for (int i = 0; i < iterations; i++) {
@@ -262,7 +262,7 @@ public class SetTest {
 		//Kenan
 
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(key)");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(key)",MainTest.printForAnalyzer);
 		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
 		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();

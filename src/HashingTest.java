@@ -136,7 +136,7 @@ public class HashingTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(key,value)");
+		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(key,value)",MainTest.printForAnalyzer);
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan
@@ -217,7 +217,7 @@ public class HashingTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"iterator");
+		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"iterator",MainTest.printForAnalyzer);
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan
@@ -274,7 +274,7 @@ public class HashingTest {
 
 		// Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"remove(key)");
+		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"remove(key)",MainTest.printForAnalyzer);
 		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
 		ener.wallClockTimeStart = System.currentTimeMillis() / 1000.0;
 		ener.preEnergy = EnergyCheckUtils.EnergyStatCheck();

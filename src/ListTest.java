@@ -69,6 +69,7 @@ public class ListTest {
 		List<Integer> synchronizedArrayList = Collections.synchronizedList(new ArrayList<Integer>(capacity));
 		List<Integer> synchronizedLinkedList = Collections.synchronizedList(new LinkedList<Integer>());
 		List<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+
 		
 		//non synchronized lists
 		List<Integer> arrayList = new ArrayList<Integer>(capacity);
@@ -78,7 +79,7 @@ public class ListTest {
 		synchronizedLists.add(new Lists("synchronizedLinkedList", synchronizedLinkedList));
 		synchronizedLists.add(new Lists("vector", vector));
 		synchronizedLists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
-		synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
+		//synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
 		
 		List<Lists> nonSynchronizedLists = new ArrayList<>();
 		nonSynchronizedLists.add(new Lists("arrayList",arrayList));
@@ -101,6 +102,10 @@ public class ListTest {
 			
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			writeAtBeginning(list, THREADS, N, ITERATIONS);
+			list.getList().clear();
+			
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			writeAtMiddle(list, THREADS, N, ITERATIONS);
 			list.getList().clear();
 			
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
@@ -127,6 +132,10 @@ public class ListTest {
 			list.getList().clear();
 			
 			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
+			writeAtMiddle(list, ZERO_THREADS, N, ITERATIONS);
+			list.getList().clear();
+			
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			writeAtEnding(list, ZERO_THREADS, N, ITERATIONS);
 			list.getList().clear();
 		}
@@ -139,7 +148,7 @@ public class ListTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(value)");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(value)",MainTest.printForAnalyzer);
 		//Kenan
 
 		for (int i = 0; i < iterations; i++) {
@@ -199,7 +208,7 @@ public class ListTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(starting-index,value)");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(starting-index,value)",MainTest.printForAnalyzer);
 		//Kenan
 
 		for (int i = 0; i < iterations; i++) {
@@ -254,12 +263,72 @@ public class ListTest {
     
 	}
 	
+	private static void writeAtMiddle(final Lists list, int threads, final int total,
+			int iterations) throws InterruptedException, ParseException {
+		List<String> lastThree = new ArrayList<>();
+		//Kenan
+		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(middle-index,value)",MainTest.printForAnalyzer);
+		//Kenan
+
+		for (int i = 0; i < iterations; i++) {
+			//Kenan
+			ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+			//Kenan
+			
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							try{ //used only in the non-thread-safe case
+							for (int j = 0; j < total; j++) {
+								list.getList().add(list.getList().size()/2,j);
+								//System.out.println(list.getList().size());
+							}
+							}catch (ArrayIndexOutOfBoundsException e){}
+						}
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				try{ 
+					for (int j = 0; j < total; j++) {
+						list.getList().add(j);
+					}
+				}catch (ArrayIndexOutOfBoundsException e){}
+			}
+			
+	  	  /**
+		   * @editStart: kenan
+		   */
+			ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+			ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+			ener.dataReport();
+			if(/*list.getList() instanceof CopyOnWriteArrayList && */i+1!=iterations){
+				list.getList().clear();
+			}
+
+		  /**
+		   * @editEnd: kenan
+		   */
+
+		}
+
+    
+	}
+	
 	private static void writeAtEnding(final Lists list, int threads, final int total,
 			int iterations) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(ending-index,value)");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(ending-index,value)",MainTest.printForAnalyzer);
 		//Kenan
 
 		for (int i = 0; i < iterations; i++) {
@@ -320,7 +389,7 @@ public class ListTest {
 
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"iterator");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"iterator",MainTest.printForAnalyzer);
 		//Kenan
 
 
@@ -384,7 +453,7 @@ public class ListTest {
 
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"traversal");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"traversal",MainTest.printForAnalyzer);
 		//Kenan
 
 
@@ -443,7 +512,7 @@ public class ListTest {
 
 
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(value)");
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(value)",MainTest.printForAnalyzer);
 		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
 		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
