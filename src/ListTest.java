@@ -79,7 +79,7 @@ public class ListTest {
 		synchronizedLists.add(new Lists("synchronizedLinkedList", synchronizedLinkedList));
 		synchronizedLists.add(new Lists("vector", vector));
 		synchronizedLists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
-		//synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
+		synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
 		
 		List<Lists> nonSynchronizedLists = new ArrayList<>();
 		nonSynchronizedLists.add(new Lists("arrayList",arrayList));
@@ -352,12 +352,13 @@ public class ListTest {
 					executors.execute(new Runnable() {
 						@Override
 						public void run() {
-							try{ //used only in the non-thread-safe case
-							for (int j = 0; j < total; j++) {
-								list.getList().add(list.getList().size(),j);
-								//System.out.println(list.getList().size());
+							try{ 
+								for (int j = 0; j < total; j++) {
+									list.getList().add(list.getList().size(),j);
+								}
+							}catch (Exception e){
+								e.printStackTrace();
 							}
-							}catch (ArrayIndexOutOfBoundsException e){}
 						}
 					});
 				}
@@ -366,9 +367,11 @@ public class ListTest {
 			} else {
 				try{ 
 					for (int j = 0; j < total; j++) {
-						list.getList().add(j);
+						list.getList().add(list.getList().size(),j);
 					}
-				}catch (ArrayIndexOutOfBoundsException e){}
+				}catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 			
 	  	  /**
@@ -417,12 +420,14 @@ public class ListTest {
 							int i = 0;
 							try {
 								//System.out.println(list.getList().size());
-							for (Integer key : list.getList()) {
-								Integer e = key;
-								i++;
-								if(i >= total) break;
+								for (Integer key : list.getList()) {
+									Integer e = key;
+									i++;
+									if(i >= total) break;
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
-						} catch (Exception e) {}
 						}
 					});
 				}
@@ -436,7 +441,9 @@ public class ListTest {
 						z++;
 						if(z >= total) break;
 					}
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
       /**
        * @editStart: kenan
