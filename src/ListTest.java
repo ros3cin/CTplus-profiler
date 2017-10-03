@@ -96,7 +96,7 @@ public class ListTest {
 			
 			//Kenan: Reinitializing data printer for remove. No warmup.
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
-			traversalRemove(list, THREADS, N);
+			removeFromBeginning(list, THREADS, N);
 
 			list.getList().clear();
 			
@@ -106,10 +106,14 @@ public class ListTest {
 			
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			writeAtMiddle(list, THREADS, N, ITERATIONS);
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP);
+			removeFromMiddle(list, THREADS, N);
 			list.getList().clear();
 			
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			writeAtEnding(list, THREADS, N, ITERATIONS);
+			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP);
+			removeFromEnding(list, THREADS, N);
 			list.getList().clear();
 		}
 		
@@ -123,7 +127,7 @@ public class ListTest {
 			traversalGet(list, ZERO_THREADS, N, ITERATIONS);
 			//Kenan: Reinitializing data printer for remove. No warmup.
 			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
-			traversalRemove(list, ZERO_THREADS, N);
+			removeFromBeginning(list, ZERO_THREADS, N);
 
 			list.getList().clear();
 			
@@ -133,10 +137,14 @@ public class ListTest {
 			
 			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			writeAtMiddle(list, ZERO_THREADS, N, ITERATIONS);
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP);
+			removeFromMiddle(list, ZERO_THREADS, N);
 			list.getList().clear();
 			
 			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, ITERATIONS, WARMUP);
 			writeAtEnding(list, ZERO_THREADS, N, ITERATIONS);
+			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP);
+			removeFromEnding(list, ZERO_THREADS, N);
 			list.getList().clear();
 		}
 		
@@ -473,8 +481,10 @@ public class ListTest {
 							List<Integer> l = list.getList();
 							for (int j = 0; j < total; j++) {
 								try {
-								Integer e = l.get(j);
-							} catch (Exception e) {}
+									Integer e = l.get(j);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 						}
 					});
@@ -486,7 +496,9 @@ public class ListTest {
 				for (int j = 0; j < total; j++) {
 					try {
 						Integer e = l.get(j);
-					} catch (Exception e) {}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
       /**
@@ -506,13 +518,13 @@ public class ListTest {
 		}
 	}
 
-	static void traversalRemove(final Lists list, final int threads, final int total) throws InterruptedException, ParseException {
+	static void removeFromBeginning(final Lists list, final int threads, final int total) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 
 
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(value)",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(starting-index)",MainTest.printForAnalyzer);
 		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
 		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
@@ -527,9 +539,10 @@ public class ListTest {
 						List<Integer> l = list.getList();
 						try {
 							for (int j = 0; j < total; j++) {
-								Integer e = l.remove(j);
+								Integer e = l.remove(0);
 							}
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
 				});
@@ -541,9 +554,124 @@ public class ListTest {
 			List<Integer> l = list.getList();
 			try {
 				for (int j = 0; j < total; j++) {
+					Integer e = l.remove(0);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+   /**
+       * @editStart: kenan
+       */
+      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+		ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+		ener.dataReport();
+
+      /**
+       * @editEnd: kenan
+       */
+
+	}
+	
+	static void removeFromEnding(final Lists list, final int threads, final int total) throws InterruptedException, ParseException {
+		List<String> lastThree = new ArrayList<>();
+		//Kenan
+
+
+		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(ending-index)",MainTest.printForAnalyzer);
+		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+		//Kenan
+		
+		if(threads>0) {
+			ExecutorService executors = Executors.newFixedThreadPool(threads);
+			for (int j = 0; j < threads; j++) {
+				executors.execute(new Runnable() {
+					@Override
+					public void run() {
+						List<Integer> l = list.getList();
+						try {
+							for (int j = total-1; j >= 0; j--) {
+								Integer e = l.remove(j);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+	
+			executors.shutdown();
+			executors.awaitTermination(1, TimeUnit.DAYS);
+		} else {
+			List<Integer> l = list.getList();
+			try {
+				for (int j = total-1; j >= 0; j--) {
 					Integer e = l.remove(j);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+   /**
+       * @editStart: kenan
+       */
+      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+		ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+		ener.dataReport();
+
+      /**
+       * @editEnd: kenan
+       */
+
+	}
+	
+	static void removeFromMiddle(final Lists list, final int threads, final int total) throws InterruptedException, ParseException {
+		List<String> lastThree = new ArrayList<>();
+		//Kenan
+
+
+		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"remove(middle-index)",MainTest.printForAnalyzer);
+		ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+		ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+		//Kenan
+		
+		if(threads>0) {
+			ExecutorService executors = Executors.newFixedThreadPool(threads);
+			for (int j = 0; j < threads; j++) {
+				executors.execute(new Runnable() {
+					@Override
+					public void run() {
+						List<Integer> l = list.getList();
+						try {
+							for (int j = total-1; j >= 0; j--) {
+								Integer e = l.remove(j/2);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+	
+			executors.shutdown();
+			executors.awaitTermination(1, TimeUnit.DAYS);
+		} else {
+			List<Integer> l = list.getList();
+			try {
+				for (int j = total-1; j >= 0; j--) {
+					Integer e = l.remove(j/2);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 
