@@ -3,6 +3,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
@@ -94,6 +95,7 @@ public class ListTest {
 			write(list, THREADS, N, ITERATIONS);
 			traversalIterator(list, THREADS, N, ITERATIONS);
 			traversalGet(list, THREADS, N, ITERATIONS);
+			randomGet(list, THREADS, N, ITERATIONS);
 			
 			//Kenan: Reinitializing data printer for remove. No warmup.
 			EnergyCalc.preInit(0, THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
@@ -126,6 +128,8 @@ public class ListTest {
 			write(list, ZERO_THREADS, N, ITERATIONS);
 			traversalIterator(list, ZERO_THREADS, N, ITERATIONS);
 			traversalGet(list, ZERO_THREADS, N, ITERATIONS);
+			randomGet(list, ZERO_THREADS, N, ITERATIONS);
+			
 			//Kenan: Reinitializing data printer for remove. No warmup.
 			EnergyCalc.preInit(0, ZERO_THREADS, 0, 0, 0, 0, 0, 0, RMITERATION, NOWARMUP); //change iteration to be one for remove operation
 			removeFromBeginning(list, ZERO_THREADS, N);
@@ -527,7 +531,75 @@ public class ListTest {
 
 		}
 	}
+	
+	static void randomGet(final Lists list, final int threads, final int total,
+			int iterations) throws InterruptedException, ParseException {
 
+		//Kenan
+		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"randomGet",MainTest.printForAnalyzer);
+		//Kenan
+
+		Random rng = new Random((new Date()).getTime());
+		int[] randomPositions = new int[total];
+		for(int z = 0;z<total;z++) {
+			randomPositions[z]=rng.nextInt(total);
+		}
+
+		for (int i = 0; i < iterations; i++) {
+			//Kenan
+			ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
+			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
+			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
+			//Kenan
+			
+			if(threads>0) {
+				ExecutorService executors = Executors.newFixedThreadPool(threads);
+				for (int j = 0; j < threads; j++) {
+					executors.execute(new Runnable() {
+						@Override
+						public void run() {
+							List<Integer> l = list.getList();
+							
+							for (int j = 0; j < (total/threads); j++) {
+								try {
+									Integer e = l.get(randomPositions[j]);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					});
+				}
+				executors.shutdown();
+				executors.awaitTermination(1, TimeUnit.DAYS);
+			} else {
+				List<Integer> l = list.getList();
+				for (int j = 0; j < total; j++) {
+					try {
+						Integer e = l.get(randomPositions[j]);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+      /**
+       * @editStart: kenan
+       */
+      	ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
+		ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
+		ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
+		ener.dataReport();
+
+      /**
+       * @editEnd: kenan
+       */
+
+
+
+		}
+	}
+	
 	static void removeFromBeginning(final Lists list, final int threads, final int total) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
