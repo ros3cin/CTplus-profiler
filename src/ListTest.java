@@ -94,7 +94,7 @@ public class ListTest {
 			// we should write before read or remove ops
 			write(list, THREADS, N, ITERATIONS);
 			traversalIterator(list, THREADS, N, ITERATIONS);
-			traversalGet(list, THREADS, N, ITERATIONS);
+			sequencialGet(list, THREADS, N, ITERATIONS);
 			randomGet(list, THREADS, N, ITERATIONS);
 			
 			//Kenan: Reinitializing data printer for remove. No warmup.
@@ -127,7 +127,7 @@ public class ListTest {
 			// we should write before read or remove ops
 			write(list, ZERO_THREADS, N, ITERATIONS);
 			traversalIterator(list, ZERO_THREADS, N, ITERATIONS);
-			traversalGet(list, ZERO_THREADS, N, ITERATIONS);
+			sequencialGet(list, ZERO_THREADS, N, ITERATIONS);
 			randomGet(list, ZERO_THREADS, N, ITERATIONS);
 			
 			//Kenan: Reinitializing data printer for remove. No warmup.
@@ -469,13 +469,13 @@ public class ListTest {
   
 	}
 
-	static void traversalGet(final Lists list, final int threads, final int total,
+	static void sequencialGet(final Lists list, final int threads, final int total,
 			int iterations) throws InterruptedException, ParseException {
 		List<String> lastThree = new ArrayList<>();
 
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"traversal",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"sequencialGet",MainTest.printForAnalyzer);
 		//Kenan
 
 
