@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -173,7 +174,7 @@ public class ListTest {
 						@Override
 						public void run() {
 							try{ //used only in the non-thread-safe case
-							for (int j = 0; j < total; j++) {
+							for (int j = 0; j < (total/threads); j++) {
 								list.getList().add(j);
 								//System.out.println(list.getList().size());
 							}
@@ -221,6 +222,7 @@ public class ListTest {
 
 		for (int i = 0; i < iterations; i++) {
 			//Kenan
+			ener.timePreDate = new Date();
 			ener.timePreamble = mainTimeHelper.getCurrentThreadTimeInfo();
 			ener.wallClockTimeStart = System.currentTimeMillis()/1000.0;
 			ener.preEnergy= EnergyCheckUtils.EnergyStatCheck();
@@ -233,7 +235,7 @@ public class ListTest {
 						@Override
 						public void run() {
 							try{ //used only in the non-thread-safe case
-							for (int j = 0; j < total; j++) {
+							for (int j = 0; j < (total/threads); j++) {
 								list.getList().add(0,j);
 								//System.out.println(list.getList().size());
 							}
@@ -254,6 +256,7 @@ public class ListTest {
 	  	  /**
 		   * @editStart: kenan
 		   */
+			ener.timePosDate = new Date();
 			ener.timeEpilogue= mainTimeHelper.getCurrentThreadTimeInfo();
 			ener.wallClockTimeEnd  = System.currentTimeMillis()/1000.0;
 			ener.postEnergy= EnergyCheckUtils.EnergyStatCheck();
@@ -293,7 +296,7 @@ public class ListTest {
 						@Override
 						public void run() {
 							try{ //used only in the non-thread-safe case
-							for (int j = 0; j < total; j++) {
+							for (int j = 0; j < (total/threads); j++) {
 								list.getList().add(list.getList().size()/2,j);
 								//System.out.println(list.getList().size());
 							}
@@ -353,7 +356,7 @@ public class ListTest {
 						@Override
 						public void run() {
 							try{ 
-								for (int j = 0; j < total; j++) {
+								for (int j = 0; j < (total/threads); j++) {
 									list.getList().add(list.getList().size(),j);
 								}
 							}catch (Exception e){
@@ -423,7 +426,7 @@ public class ListTest {
 								for (Integer key : list.getList()) {
 									Integer e = key;
 									i++;
-									if(i >= total) break;
+									if(i >= (total/threads)) break;
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -486,7 +489,7 @@ public class ListTest {
 						@Override
 						public void run() {
 							List<Integer> l = list.getList();
-							for (int j = 0; j < total; j++) {
+							for (int j = 0; j < (total/threads); j++) {
 								try {
 									Integer e = l.get(j);
 								} catch (Exception e) {
@@ -545,7 +548,7 @@ public class ListTest {
 					public void run() {
 						List<Integer> l = list.getList();
 						try {
-							for (int j = 0; j < total; j++) {
+							for (int j = 0; j < (total/threads); j++) {
 								Integer e = l.remove(0);
 							}
 						} catch (Exception e) {
@@ -602,7 +605,7 @@ public class ListTest {
 					public void run() {
 						List<Integer> l = list.getList();
 						try {
-							for (int j = total-1; j >= 0; j--) {
+							for (int j = (total-1)/threads; j >= 0; j--) {
 								Integer e = l.remove(j);
 							}
 						} catch (Exception e) {
@@ -659,7 +662,7 @@ public class ListTest {
 					public void run() {
 						List<Integer> l = list.getList();
 						try {
-							for (int j = total-1; j >= 0; j--) {
+							for (int j = (total-1)/threads; j >= 0; j--) {
 								Integer e = l.remove(j/2);
 							}
 						} catch (Exception e) {

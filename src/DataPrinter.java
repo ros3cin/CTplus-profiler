@@ -3,6 +3,7 @@
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 
 public class DataPrinter extends EnergyCalc{
 	
@@ -87,7 +88,8 @@ public class DataPrinter extends EnergyCalc{
 		}
 		
 		if(printForAnalyzer) {
-			System.out.print(signal+","+operationName+","+gpuEnergySum[0]+","+cpuEnergySum[0]+","+pkgEnergySum[0]);
+			long timeDif = this.timePosDate.getTime()-this.timePreDate.getTime();
+			System.out.print(signal+","+operationName+","+gpuEnergySum[0]+","+cpuEnergySum[0]+","+pkgEnergySum[0]+","+(timeDif/1000.0f)/loopNum);
 		}
 		System.out.println();
 	}

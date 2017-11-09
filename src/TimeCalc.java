@@ -1,10 +1,13 @@
-
+import java.util.Date;
 
 public class TimeCalc {
     public String preEnergy = new String();
     public String postEnergy = new String();
     public String timePreamble = new String();
     public String timeEpilogue = new String();
+    
+    public Date timePreDate = new Date();
+    public Date timePosDate = new Date();
     
     private int numThreads = 0;
     
@@ -44,8 +47,8 @@ public class TimeCalc {
 		tempCpuTime = Double.parseDouble(timeInfoEnd[1]) - Double.parseDouble(timeInfoStart[1]);
 		tempKernelModeTime = tempCpuTime - tempUserModeTime;
 		
-		tempUserModeTime /= 1000000000.0;	//Get second
-		tempCpuTime /= 1000000000.0;
+		tempUserModeTime /= 1000000.0;	//Get second
+		tempCpuTime /= 1000000.0;
 		
 		tempKernelModeTime = tempKernelModeTime > 0.0 ? tempKernelModeTime / 1000000000.0 : 0.0;	//it could be negative because of precision problem for Java API
 		
