@@ -252,7 +252,7 @@ public class ListTest {
 			} else {
 				try{ 
 					for (int j = 0; j < total; j++) {
-						list.getList().add(j);
+						list.getList().add(0,j);
 					}
 				}catch (ArrayIndexOutOfBoundsException e){}
 			}
@@ -313,7 +313,7 @@ public class ListTest {
 			} else {
 				try{ 
 					for (int j = 0; j < total; j++) {
-						list.getList().add(j);
+						list.getList().add(list.getList().size()/2,j);
 					}
 				}catch (ArrayIndexOutOfBoundsException e){}
 			}
