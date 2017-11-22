@@ -221,7 +221,7 @@ public class ListTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(starting-index,value)",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(starting-index;value)",MainTest.printForAnalyzer);
 		//Kenan
 
 		for (int i = 0; i < iterations; i++) {
@@ -283,7 +283,7 @@ public class ListTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(middle-index,value)",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(middle-index;value)",MainTest.printForAnalyzer);
 		//Kenan
 
 		for (int i = 0; i < iterations; i++) {
@@ -343,7 +343,7 @@ public class ListTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(ending-index,value)",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"add(ending-index;value)",MainTest.printForAnalyzer);
 		//Kenan
 
 		for (int i = 0; i < iterations; i++) {
