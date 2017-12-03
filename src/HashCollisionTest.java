@@ -142,7 +142,7 @@ public class HashCollisionTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(constant-key,value)",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(constant-key;value)",MainTest.printForAnalyzer);
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan

@@ -86,7 +86,7 @@ public class SetTest {
 		synchronizedSets.add(new Lists("concurrentSkipListSet", concurrentSkipListSet));
 		synchronizedSets.add(new Lists("setFromConcurrentHashMap", setFromConcurrentHashMap));
 		synchronizedSets.add(new Lists("setFromConcurrentHashMapV8", setFromConcurrentHashMapV8));
-		synchronizedSets.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
+		//synchronizedSets.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
 		synchronizedSets.add(new Lists("synchronizedTreeSet", synchronizedTreeSet));
 		
 		List<Lists> nonSynchronizedSets = new ArrayList<>();
@@ -177,7 +177,7 @@ public class SetTest {
 			if(threads>0) {
 				ExecutorService executors = Executors.newFixedThreadPool(threads);
 				for (int j = 0; j < threads; j++) {
-					executors.execute(new Run(list, j, total));
+					executors.execute(new Run(list, j, total/threads));
 				}
 				executors.shutdown();
 				executors.awaitTermination(1, TimeUnit.DAYS);
@@ -227,8 +227,12 @@ public class SetTest {
 					executors.execute(new Runnable() {
 						@Override
 						public void run() {
+							int z=0;
 							for (String key : list.getSet()) {
 								String e = key;
+								z++;
+								if(z>=(total/threads))
+									break;
 							}
 						}
 					});
@@ -271,7 +275,7 @@ public class SetTest {
 		if(threads>0) {
 			ExecutorService executors = Executors.newFixedThreadPool(threads);
 			for (int j = 0; j < threads; j++) {
-				executors.execute(new Remover(list, j, total));
+				executors.execute(new Remover(list, j, total/threads));
 			}
 			executors.shutdown();
 			executors.awaitTermination(1, TimeUnit.DAYS);

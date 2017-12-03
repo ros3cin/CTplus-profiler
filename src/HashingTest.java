@@ -136,7 +136,7 @@ public class HashingTest {
 		List<String> lastThree = new ArrayList<>();
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(key,value)",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(map.name, MAINTHREAD,"put(key;value)",MainTest.printForAnalyzer);
 		//Kenan
 		for (int i = 0; i < iterations; i++) {
 			//Kenan
@@ -148,7 +148,7 @@ public class HashingTest {
 			if(threads>0) {
 				ExecutorService executors = Executors.newFixedThreadPool(threads);
 				for (int j = 0; j < threads; j++) {
-					executors.execute(new Writer(map, j, total));
+					executors.execute(new Writer(map, j, total/threads));
 				}
 				executors.shutdown();
 				executors.awaitTermination(1, TimeUnit.DAYS);
@@ -237,7 +237,7 @@ public class HashingTest {
 							for (String key : keys) {
 								Integer e = map.getMap().get(key);
 								i++;
-								if(i>= total) break;
+								if(i>= (total/threads)) break;
 							}
 						}
 					});
@@ -283,7 +283,7 @@ public class HashingTest {
 		if(threads>0) {
 			ExecutorService executors = Executors.newFixedThreadPool(threads);
 			for (int j = 0; j < threads; j++) {
-				executors.execute(new Remover(map, j, total));
+				executors.execute(new Remover(map, j, total/threads));
 			}
 			executors.shutdown();
 			executors.awaitTermination(1, TimeUnit.DAYS);
