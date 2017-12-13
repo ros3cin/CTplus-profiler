@@ -16,6 +16,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.map.HashedMap;
+import org.apache.commons.collections4.map.StaticBucketMap;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+
 import jsr166e.ConcurrentHashMapV8;
 
 
@@ -74,6 +78,7 @@ public class HashingTest {
 
 		System.out.format("Conf: Iterations=%s, threads=%s, N=%s, capacity=%s, load_factor=%s\n", ITERATIONS, THREADS, N, capacity, loadFactor);
 		
+		//synchronized
 		Map<String, Integer> concurrentHashMapV8 = new ConcurrentHashMapV8<>(capacity, loadFactor);
 		Map<String, Integer> concurrentHashMap = new ConcurrentHashMap<>(capacity, loadFactor);
 		Map<String, Integer> hashtable = new Hashtable<>(capacity, loadFactor);
@@ -83,10 +88,24 @@ public class HashingTest {
 		Map<String, Integer> synchronizedTreeMap = Collections.synchronizedSortedMap(new TreeMap<String, Integer>());
 		Map<String, Integer> synchronizedWeakHashMap = Collections.synchronizedMap(new WeakHashMap<String, Integer>());
 		
+		//eclipse collections
+		Map<String, Integer> concurrentHashMapEclipseCollections = new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<String, Integer>();
+		Map<String, Integer> synchronizedUnifiedMap = (new UnifiedMap<String, Integer>(capacity,loadFactor)).asSynchronized();
+		
+		//from apache collections
+		Map<String,Integer> staticBucketMap = new StaticBucketMap<String,Integer>(capacity);
+		
+		//non synchronized
 		Map<String, Integer> hashMap = new HashMap<String, Integer>(capacity,loadFactor);
 		Map<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>(capacity, loadFactor);
 		Map<String, Integer> treeMap = new TreeMap<String, Integer>();
 		Map<String, Integer> weakHashMap = new WeakHashMap<String, Integer>(capacity,loadFactor);
+		
+		//eclipse collections
+		Map<String, Integer> unifiedMap = new UnifiedMap<String, Integer>(capacity,loadFactor);
+		
+		//from apache collections
+		Map<String,Integer> hashedMap = new HashedMap<String,Integer>(capacity,loadFactor);
 		
 
 		List<Hash> synchronizedMaps = new ArrayList<>();
@@ -98,12 +117,17 @@ public class HashingTest {
 		synchronizedMaps.add(new Hash("concurrentSkipListMap", concurrentSkipListMap));
 		synchronizedMaps.add(new Hash("synchronizedTreeMap", synchronizedTreeMap));
 		synchronizedMaps.add(new Hash("synchronizedWeakHashMap", synchronizedWeakHashMap));
+		synchronizedMaps.add(new Hash("concurrentHashMap(EclipseCollections)", concurrentHashMapEclipseCollections));
+		synchronizedMaps.add(new Hash("synchronizedUnifiedMap(EclipseCollections)", synchronizedUnifiedMap));
+		synchronizedMaps.add(new Hash("staticBucketMap(ApacheCommonsCollections)", staticBucketMap));
 		
 		List<Hash> nonSynchronizedMaps = new ArrayList<>();
 		nonSynchronizedMaps.add(new Hash("hashMap", hashMap));
 		nonSynchronizedMaps.add(new Hash("linkedHashMap", linkedHashMap));
 		nonSynchronizedMaps.add(new Hash("treeMap", treeMap));
 		nonSynchronizedMaps.add(new Hash("weakHashMap", weakHashMap));
+		nonSynchronizedMaps.add(new Hash("unifiedMap(EclipseCollections)", unifiedMap));
+		nonSynchronizedMaps.add(new Hash("hashedMap(ApacheCommonsCollections)", hashedMap));
 		
 		for (final Hash map : synchronizedMaps) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get

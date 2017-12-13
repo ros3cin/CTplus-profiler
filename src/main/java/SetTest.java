@@ -14,6 +14,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.set.sorted.mutable.TreeSortedSet;
+
 import jsr166e.ConcurrentHashMapV8;
 
 public class SetTest {
@@ -68,6 +71,7 @@ public class SetTest {
 
 		System.out.format("Conf: Iterations=%s, threads=%s, N=%s, capacity=%s\n", ITERATIONS, THREADS, N, capacity);
 		
+		//synchronized
 		Set<String> synchronizedLinkedHashSet = Collections.synchronizedSet(new LinkedHashSet<>());
 		Set<String> synchronizedHashSet = Collections.synchronizedSet(new HashSet<String>());
 		Set<String> copyOnWriteArraySet = new CopyOnWriteArraySet<>();
@@ -76,9 +80,20 @@ public class SetTest {
 		Set<String> setFromConcurrentHashMapV8 = Collections.newSetFromMap((new ConcurrentHashMapV8<String, Boolean>()));
 		Set<String> synchronizedTreeSet = Collections.synchronizedSortedSet(new TreeSet<String>());
 		
+		//eclipse collections
+		Set<String> synchronizedUnifiedSet = (new UnifiedSet<String>()).asSynchronized();
+		Set<String> synchronizedTreeSortedSet = (new TreeSortedSet<String>()).asSynchronized();
+		
+		//non sychronized
 		Set<String> hashSet = new HashSet<String>();
 		Set<String> linkedHashSet = new LinkedHashSet<String>();
 		Set<String> treeSet = new TreeSet<String>();
+		
+		//eclipse collections
+		Set<String> unifiedSet = new UnifiedSet<String>();
+		Set<String> treeSortedSet = new TreeSortedSet<String>();
+		
+		
 
 		List<Lists> synchronizedSets = new ArrayList<>();
 		synchronizedSets.add(new Lists("synchronizedLinkedHashSet", synchronizedLinkedHashSet));
@@ -88,11 +103,15 @@ public class SetTest {
 		synchronizedSets.add(new Lists("setFromConcurrentHashMapV8", setFromConcurrentHashMapV8));
 		//synchronizedSets.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
 		synchronizedSets.add(new Lists("synchronizedTreeSet", synchronizedTreeSet));
+		synchronizedSets.add(new Lists("synchronizedTreeSortedSet(Eclipse Collections)", synchronizedTreeSortedSet));
+		synchronizedSets.add(new Lists("synchronizedUnifiedSet(Eclipse Collections)", synchronizedUnifiedSet));
 		
 		List<Lists> nonSynchronizedSets = new ArrayList<>();
 		nonSynchronizedSets.add(new Lists("hashSet",hashSet));
 		nonSynchronizedSets.add(new Lists("linkedHashSet",linkedHashSet));
 		nonSynchronizedSets.add(new Lists("treeSet",treeSet));
+		nonSynchronizedSets.add(new Lists("unifiedSet(Eclipse Collections)",unifiedSet));
+		nonSynchronizedSets.add(new Lists("treeSortedSet(Eclipse Collections)",treeSortedSet));
 
 		for (final Lists list : synchronizedSets) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get

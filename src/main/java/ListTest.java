@@ -12,6 +12,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.list.CursorableLinkedList;
+import org.apache.commons.collections4.list.NodeCachingLinkedList;
+import org.apache.commons.collections4.list.TreeList;
+import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
+import org.eclipse.collections.impl.list.mutable.SynchronizedMutableList;
+
 
 public class ListTest {
 
@@ -71,21 +78,39 @@ public class ListTest {
 		List<Integer> synchronizedArrayList = Collections.synchronizedList(new ArrayList<Integer>(capacity));
 		List<Integer> synchronizedLinkedList = Collections.synchronizedList(new LinkedList<Integer>());
 		List<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+		
+		//from eclipse collections
+		List<Integer> synchronizedFastList = (new FastList<Integer>(capacity)).asSynchronized();
+		
+		//from apache commons collections
+		List<Integer> cursorableLinkedList = new CursorableLinkedList<Integer>();
 
 		
 		//non synchronized lists
 		List<Integer> arrayList = new ArrayList<Integer>(capacity);
 		List<Integer> linkedList = new LinkedList<Integer>();
+		
+		//from eclipse collections
+		List<Integer> fastList = new FastList<Integer>(capacity);
+		
+		//from apache commons collections
+		List<Integer> treeList = new TreeList<Integer>();
+		List<Integer> nodeCachingLinkedList = new NodeCachingLinkedList<Integer>(capacity);
 
 		List<Lists> synchronizedLists = new ArrayList<>();
 		synchronizedLists.add(new Lists("synchronizedLinkedList", synchronizedLinkedList));
 		synchronizedLists.add(new Lists("vector", vector));
 		synchronizedLists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
 		synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
+		synchronizedLists.add(new Lists("synchronizedFastList(EclipseCollections)", synchronizedFastList));
+		//synchronizedLists.add(new Lists("cursorableLinkedList(ApacheCommonsCollections)", cursorableLinkedList));
 		
 		List<Lists> nonSynchronizedLists = new ArrayList<>();
 		nonSynchronizedLists.add(new Lists("arrayList",arrayList));
 		nonSynchronizedLists.add(new Lists("linkedList",linkedList));
+		nonSynchronizedLists.add(new Lists("fastList(EclipseCollections)",fastList));
+		nonSynchronizedLists.add(new Lists("treeList(ApacheCommonsCollections)",treeList));
+		nonSynchronizedLists.add(new Lists("nodeCachingLinkedList(ApacheCommonsCollections)",nodeCachingLinkedList));
 
 		for (final Lists list : synchronizedLists) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get
