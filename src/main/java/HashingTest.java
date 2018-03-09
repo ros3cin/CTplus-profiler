@@ -120,6 +120,7 @@ public class HashingTest {
 		synchronizedMaps.add(new Hash("concurrentHashMap(EclipseCollections)", concurrentHashMapEclipseCollections));
 		synchronizedMaps.add(new Hash("synchronizedUnifiedMap(EclipseCollections)", synchronizedUnifiedMap));
 		synchronizedMaps.add(new Hash("staticBucketMap(ApacheCommonsCollections)", staticBucketMap));
+		synchronizedMaps.add(new Hash("synchronizedLinkedHashMap", synchronizedLinkedHashMap));
 		
 		List<Hash> nonSynchronizedMaps = new ArrayList<>();
 		nonSynchronizedMaps.add(new Hash("hashMap", hashMap));
