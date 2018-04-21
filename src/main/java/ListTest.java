@@ -81,9 +81,6 @@ public class ListTest {
 		
 		//from eclipse collections
 		List<Integer> synchronizedFastList = (new FastList<Integer>(capacity)).asSynchronized();
-		
-		//from apache commons collections
-		List<Integer> cursorableLinkedList = new CursorableLinkedList<Integer>();
 
 		
 		//non synchronized lists
@@ -96,6 +93,7 @@ public class ListTest {
 		//from apache commons collections
 		List<Integer> treeList = new TreeList<Integer>();
 		List<Integer> nodeCachingLinkedList = new NodeCachingLinkedList<Integer>(capacity);
+		List<Integer> cursorableLinkedList = new CursorableLinkedList<Integer>();
 
 		List<Lists> synchronizedLists = new ArrayList<>();
 		synchronizedLists.add(new Lists("synchronizedLinkedList", synchronizedLinkedList));
@@ -103,7 +101,6 @@ public class ListTest {
 		synchronizedLists.add(new Lists("synchronizedArrayList", synchronizedArrayList));
 		synchronizedLists.add(new Lists("copyOnWriteArrayList", copyOnWriteArrayList));
 		synchronizedLists.add(new Lists("synchronizedFastList(EclipseCollections)", synchronizedFastList));
-		//synchronizedLists.add(new Lists("cursorableLinkedList(ApacheCommonsCollections)", cursorableLinkedList));
 		
 		List<Lists> nonSynchronizedLists = new ArrayList<>();
 		nonSynchronizedLists.add(new Lists("arrayList",arrayList));
@@ -111,6 +108,7 @@ public class ListTest {
 		nonSynchronizedLists.add(new Lists("fastList(EclipseCollections)",fastList));
 		nonSynchronizedLists.add(new Lists("treeList(ApacheCommonsCollections)",treeList));
 		nonSynchronizedLists.add(new Lists("nodeCachingLinkedList(ApacheCommonsCollections)",nodeCachingLinkedList));
+		nonSynchronizedLists.add(new Lists("cursorableLinkedList(ApacheCommonsCollections)", cursorableLinkedList));
 
 		for (final Lists list : synchronizedLists) {
 			//Kenan: Initializing data printer for write, traversalIterator and Get
