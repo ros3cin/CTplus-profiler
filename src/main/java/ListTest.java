@@ -498,7 +498,7 @@ public class ListTest {
 
 		//Kenan
 		TimeCheckUtils mainTimeHelper = new TimeCheckUtils();
-		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"sequencialGet",MainTest.printForAnalyzer);
+		DataPrinter ener = new DataPrinter(list.name, MAINTHREAD,"sequentialGet",MainTest.printForAnalyzer);
 		//Kenan
 
 

@@ -101,7 +101,7 @@ public class SetTest {
 		synchronizedSets.add(new Lists("concurrentSkipListSet", concurrentSkipListSet));
 		synchronizedSets.add(new Lists("setFromConcurrentHashMap", setFromConcurrentHashMap));
 		synchronizedSets.add(new Lists("setFromConcurrentHashMapV8", setFromConcurrentHashMapV8));
-		//synchronizedSets.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
+		synchronizedSets.add(new Lists("copyOnWriteArraySet", copyOnWriteArraySet));
 		synchronizedSets.add(new Lists("synchronizedTreeSet", synchronizedTreeSet));
 		synchronizedSets.add(new Lists("synchronizedTreeSortedSet(Eclipse Collections)", synchronizedTreeSortedSet));
 		synchronizedSets.add(new Lists("synchronizedUnifiedSet(Eclipse Collections)", synchronizedUnifiedSet));
