@@ -11,6 +11,8 @@ Don't forget to initialize the msr module with:
 ```
 sudo modprobe msr
 ```
+When using Eclipse, you should run it as sudo, otherwise the application will fail to use the MSR module.
+
 Instructions
 --------------------------------------------------------------
 To run the profiler:
