@@ -3,10 +3,10 @@ public class MainTest {
 	public static boolean printForAnalyzer = true;
 	public static void main(String[] args) throws Exception {
 
-//		if (args.length != 5) {
-//			System.out.println("Usage data-structures.jar [data-structure] [threads] [input] [initial_capacity [load_factor]");
-//			System.exit(0);
-//		}
+		if (args.length != 5) {
+			System.out.println("Usage data-structures.jar [data-structure] [threads] [input] [initial_capacity [load_factor]");
+			System.exit(0);
+		}
 		
 		String construct = args[0];
 		System.out.println(construct);
